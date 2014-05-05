@@ -1,0 +1,10 @@
+{
+  "name": "jquery-geolocation",
+  "authors": [
+    {"name": "Matt Rose", "email": "matt@mattrose.ca"}
+  ],
+  "dependencies": {
+    "jquery.cookie": "1.3.x",
+    "jquery-loader": "ssh://git@stash.carpages.ca/gem/jquery-loader.git#0.1.x"
+  }
+}
