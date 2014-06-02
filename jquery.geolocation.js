@@ -1,290 +1,433 @@
+/**
+ * @fileoverview
+
+Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
+
+### Notes
+- It's best to work with the user's location by binding callback functions
+
+ *
+ * @namespace jquery.geolocation
+ * @copyright Carpages.ca 2014
+ * @author Matt Rose <matt@mattrose.ca>
+ *
+ * @requires jquery
+ * @requires jquery.plugin
+ *
+ * @example
+  // Callback for initial load
+  $.geolocation('bind', 'init', function(){
+    // 'this' has access to all of the plugins methods
+    var geo = this;
+  });
+
+  // Callback for when the location changes
+  $.geolocation('bind', 'change', function(){
+    consele.log(this.get());
+  });
+ */
+
 /* Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP =D
 *** Requires jQuery Cookie Plugin
 ================================================== */
 define(['jquery-loader', 'jquery.cookie'], function($){
 
-	$.cookie.json = true;//JSON COOKIES!!
+  $.cookie.json = true;//JSON COOKIES!!
 
-	var Geo = {
+  var Geo = {
 
-		// stores the event handlers
-		_events: {
-			// stores events that only run once
-			one: {}
-		},
+    // stores the event handlers
+    _events: {
+      // stores events that only run once
+      one: {}
+    },
 
-		// the status
-		_searching: false,
+    // the status
+    _searching: false,
 
-		// whether geolocation has been initiated
-		_init: false,
+    // whether geolocation has been initiated
+    _init: false,
 
-		// lookup request
-		_lookupRequest: false,
+    // lookup request
+    _lookupRequest: false,
 
-		// geolocation timeout
-		_geoLocationTimeout: false,
+    // geolocation timeout
+    _geoLocationTimeout: false,
 
-		// search timeout
-		_searchTimeout: false,
+    // search timeout
+    _searchTimeout: false,
 
-		// cache of the set location
-		_currentLocation: {},
+    // cache of the set location
+    _currentLocation: {},
 
-		// event handlers
-		bind: function(event, callback){
-			var that = this;
-			$.each(event.split(' '), function(i, evt){
-				if(that._events[evt]===undefined) that._events[evt] = [];
-				that._events[evt].push(callback);
-			});
-			if(event == 'init' && this._init){
-				this.trigger('init');
-			}
-		},
+    /**
+     * Bind events to different location changes
+       *Note:* You can bind several events at once using spaces
+       - init - Runs on first location initiation
+       - change - Runs when the location is changed
+     *
+     * @method
+     * @name jquery.geolocation#bind
+     * @param {string} event The name of the event(s)
+     * @param {function} callback The callback function
+    **/
+    bind: function(event, callback){
+      var Geo = this;
 
-		one: function(event, callback){
-			var that = this;
-			$.each(event.split(' '), function(i, evt){
-				if(that._events.one[evt]===undefined) that._events.one[evt] = [];
-				that._events.one[evt].push(callback);
-			});
-		},
+      $.each(event.split(' '), function(i, evt){
+        if(Geo._events[evt]===undefined) Geo._events[evt] = [];
+        // Call init events immediately if init has already been run
+        if(evt == 'init' && Geo._init){
+          callback.call(Geo);
+        }
+        Geo._events[evt].push(callback);
+      });
 
-		trigger: function(event){
-			var Geo = this;
-			if(Geo._events[event]!==undefined)
-				$.each(Geo._events[event], function(i, func){
-					func.call(Geo);
-				});
+    },
 
-			if(Geo._events.one[event]!==undefined){
-				$.each(Geo._events.one[event], function(i, func){
-					func.call(Geo);
-				});
-				Geo._events.one[event] = [];
-			}
-		},
+    /**
+     * Bind an event to run only once
+     *
+     * @method
+     * @name jquery.geolocation#one
+     * @param {string} event The name of the event(s)
+     * @param {function} callback The callback function
+    **/
+    one: function(event, callback){
+      var that = this;
+      $.each(event.split(' '), function(i, evt){
+        if(that._events.one[evt]===undefined) that._events.one[evt] = [];
+        that._events.one[evt].push(callback);
+      });
+    },
 
-		//Sets a new location object
-		set: function(location, cookie) {
-			var Geo = this;
+    /**
+     * Trigger an event to run
+     *
+     * @method
+     * @name jquery.geolocation#trigger
+     * @param {string} event The name of the event(s)
+    **/
+    trigger: function(event){
+      var Geo = this;
+      if(Geo._events[event]!==undefined)
+        $.each(Geo._events[event], function(i, func){
+          func.call(Geo);
+        });
 
-			if(cookie===undefined) cookie = true;
+      if(Geo._events.one[event]!==undefined){
+        $.each(Geo._events.one[event], function(i, func){
+          func.call(Geo);
+        });
+        Geo._events.one[event] = [];
+      }
+    },
 
-			Geo._searching = false;
-			clearTimeout(Geo._searchTimeout);
+    /**
+     * Set the user's location using the location object:
+     ```
+      {
+        "city": "",
+        "province_code": "",
+        "latitude": "",
+        "longitude": ""
+      }
+     ```
+     *
+     * @method
+     * @name jquery.geolocation#set
+     * @param {string} location The location object
+     * @param {boolean} cookie Whether to store a cookie
+    **/
+    set: function(location, cookie) {
+      var Geo = this;
 
-			if(location) {
-				//add the source and initiator
-				location = $.extend({
-					source: 'user',
-					initiator: 'user'
-				}, location);
+      if(cookie===undefined) cookie = true;
 
-				//parse it
-				location = Geo._parseLocation(location);
+      Geo._searching = false;
+      clearTimeout(Geo._searchTimeout);
 
-				//cache the location
-				this._currentLocation = location;
+      if(location) {
+        //add the source and initiator
+        location = $.extend({
+          source: 'user',
+          initiator: 'user'
+        }, location);
 
-				//store the cookie?
-				if(cookie && location.city !== '' && location.province_code !== '') {
-					this._setCookie(location);
-					if(Geo._init) Geo.trigger('cookie');
-				}
+        //parse it
+        location = Geo._parseLocation(location);
 
-				//change trigger
-				if(!Geo._init){
-					Geo._init = true;
-					Geo.trigger('init');
-				} else {
-					Geo.trigger('change');
-				}
+        //cache the location
+        this._currentLocation = location;
 
-			} else {
-				$.error("Location was not sent to geolocation.");
-			}
+        //store the cookie?
+        if(cookie && location.city !== '' && location.province_code !== '') {
+          this._setCookie(location);
+          if(Geo._init) Geo.trigger('cookie');
+        }
 
-		},
+        //change trigger
+        if(!Geo._init){
+          Geo._init = true;
+          Geo.trigger('init');
+        } else {
+          Geo.trigger('change');
+        }
 
-		get: function(){
-			return this._currentLocation;
-		},
+      } else {
+        $.error("Location was not sent to geolocation.");
+      }
 
-		search: function(options) {
+    },
 
-			var Geo = this;
+    /**
+     * Get the current location
+     *
+     * @method
+     * @name jquery.geolocation#get
+     * @return {object} Current location
+    **/
+    get: function(){
+      return this._currentLocation;
+    },
 
-			// Start timeout
-			Geo._searchTimeout = setTimeout(function(){Geo.trigger("error");},5000);
+    /**
+     * Search for the users location
+     *
+     * @method
+     * @name jquery.geolocation#search
+     * @param {object} options The options for the search
+     * @param {boolean} options.reset Weather to ignore any existing cookies
+     * @param {string} options.initiator The item that initiated the search (default is 'carpages')
+     * @param {geoLocation} options.geoLocation Weather to use HTML5 geolocation
+    **/
+    search: function(options) {
 
-			// Cancel any currently running instances of geolocation
-			if(Geo._searching) return;
-			Geo._searching = true;
+      var Geo = this;
 
-			// properties will be available through settings.propertyName
-			var settings = $.extend({
-				reset: false,
-				initiator: "carpages",
-				geoLocation: false
-			}, options);
+      // Start timeout
+      Geo._searchTimeout = setTimeout(function(){Geo.trigger("error");},5000);
 
-			// reset cookie
-			if(settings.reset) $.removeCookie('geo_location', { path: '/' });
+      // Cancel any currently running instances of geolocation
+      if(Geo._searching) return;
+      Geo._searching = true;
 
-			//If the cookie was manually set by user
-			if(Geo._getCookie().source == "user"){
-				//Return that sucker right away
-				Geo.set(Geo._getCookie());
-			}else{
-				//I will find you!!
-				if(settings.geoLocation){
-					Geo._runGeoLocation(settings.initiator);
-				} else {
-					Geo._runGeoIP(settings.initiator);
-				}
-			}
+      // properties will be available through settings.propertyName
+      var settings = $.extend({
+        reset: false,
+        initiator: "carpages",
+        geoLocation: false
+      }, options);
 
-		},
+      // reset cookie
+      if(settings.reset) $.removeCookie('geo_location', { path: '/' });
 
-		// Private functions
-		_getCookie: function(){
-			return $.cookie('geo_location') === null ? {} : $.cookie('geo_location');
-		},
+      //If the cookie was manually set by user
+      if(Geo._getCookie().source == "user"){
+        //Return that sucker right away
+        Geo.set(Geo._getCookie());
+      }else{
+        //I will find you!!
+        if(settings.geoLocation){
+          Geo._runGeoLocation(settings.initiator);
+        } else {
+          Geo._runGeoIP(settings.initiator);
+        }
+      }
 
-		_setCookie: function(location){
-			$.removeCookie('geo_location', { path: '/' });
+    },
 
-			if (location.initiator == "user"){
-				$.cookie('geo_location', location, { expires: 365, path: '/' });//Expires in 365 days
-			}else{
-				$.cookie('geo_location', location, { path: '/' });//Expires at end of session
-			}
-		},
+    /**
+     * Get the current cookie object
+     *
+     * @private
+     * @method
+     * @name jquery.geolocation#_getCookie
+     * @return {object} The stored cookie object
+    **/
+    _getCookie: function(){
+      return $.cookie('geo_location') === null ? {} : $.cookie('geo_location');
+    },
 
-		_runGeoLocation: function(initiator){
-			var Geo = this;
+    /**
+     * Set the cookie of the location
+     * *Note:* Setting location.initiator to 'user' will store the cookie for a year
+     *
+     * @private
+     * @method
+     * @name jquery.geolocation#_setCookie
+     * @param {object} location The location object to store
+    **/
+    _setCookie: function(location){
+      $.removeCookie('geo_location', { path: '/' });
 
-			//http://www.w3schools.com/html/html5_geolocation.asp
-			if (navigator.geolocation) {
+      if (location.initiator == "user"){
+        //Expires in 365 days
+        $.cookie('geo_location', location, { expires: 365, path: '/' });
+      }else{
+        //Expires at end of session
+        $.cookie('geo_location', location, { path: '/' });
+      }
+    },
 
-				if(Geo._getCookie().source == "geolocation"){//If geolocation has already been set
-					Geo.set(Geo._getCookie());
-				}else{
-					//If HTML5 geoLocation is taking too long, use ip lookup
-					Geo._geoLocationTimeout = setTimeout(function(){Geo._runGeoIP(initiator);},3000);
+    /**
+     * Run a search using HTML5 geolocation
+     *
+     * @private
+     * @method
+     * @name jquery.geolocation#_runGeoLocation
+     * @param {string} initiator The initiator of this search
+    **/
+    _runGeoLocation: function(initiator){
+      var Geo = this;
 
-					navigator.geolocation.getCurrentPosition(function(position){
-						//Geo location is successful
+      //http://www.w3schools.com/html/html5_geolocation.asp
+      if (navigator.geolocation) {
 
-						clearTimeout(Geo._geoLocationTimeout);//Cancel IP lookup
+        //If geolocation has already been set
+        if(Geo._getCookie().source == "geolocation"){
+          Geo.set(Geo._getCookie());
+        }else{
+          //If HTML5 geoLocation is taking too long, use ip lookup
+          Geo._geoLocationTimeout = setTimeout(function(){
+            Geo._runGeoIP(initiator);
+          },3000);
 
-						//Lookup the city and province
-						Geo._lookup({
-							data: position.coords,
-							success: function(location) {
-								//When geoIP returns
-								location.source = "geolocation";
-								location.initiator = initiator;
+          navigator.geolocation.getCurrentPosition(function(position){
+            //Geo location is successful
 
-								Geo.set(location);
-							}
-						});
-					}, function(){
-						//When geoLocation fails
-					});
-				}
-			} else {
-				//fallback
-				Geo._runGeoIP(initiator);
-			}
-		},
+            //Cancel IP lookup
+            clearTimeout(Geo._geoLocationTimeout);
 
-		_runGeoIP: function(initiator){
-			//Look up the geo IP
-			var Geo = this;
+            //Lookup the city and province
+            Geo._lookup({
+              data: position.coords,
+              success: function(location) {
+                //When geoIP returns
+                location.source = "geolocation";
+                location.initiator = initiator;
 
-			if(Geo._getCookie().source=="ip"){//If ip was already found during this session
+                Geo.set(location);
+              }
+            });
+          }, function(){
+            //When geoLocation fails
+          });
+        }
+      } else {
+        //fallback
+        Geo._runGeoIP(initiator);
+      }
+    },
 
-				Geo.set(Geo._getCookie());
-			}else{
-				//Otherwise, make a server call to find it
+    /**
+     * Run a search using IP search
+     *
+     * @private
+     * @method
+     * @name jquery.geolocation#_runGeoIP
+     * @param {string} initiator The initiator of this search
+    **/
+    _runGeoIP: function(initiator){
+      //Look up the geo IP
+      var Geo = this;
 
-				Geo._lookup({
-					data: {},
-					success: function(location) {
-						//When geoIP returns
-						location.source = "ip";
-						location.initiator = initiator;
+      //If ip was already found during this session
+      if(Geo._getCookie().source=="ip"){
 
-						Geo.set(location);
-					}
-				});
+        Geo.set(Geo._getCookie());
+      }else{
+        //Otherwise, make a server call to find it
 
-			}
-		},
+        Geo._lookup({
+          data: {},
+          success: function(location) {
+            //When geoIP returns
+            location.source = "ip";
+            location.initiator = initiator;
 
-		_lookup: function(options){
-			this.trigger('lookup');
+            Geo.set(location);
+          }
+        });
 
-			this._lookupRequest = $.ajax($.extend({
-				type: 'post',
-				dataType: 'json',
-				url: '/geography/locationlookup/'
-			}, options));
-		},
+      }
+    },
 
-		_parseLocation: function(loc){
-			//Province and city not set
-			var R = loc; //to return
+    /**
+     * Lookup location info using coordinates
+     *
+     * @private
+     * @method
+     * @name jquery.geolocation#_lookup
+     * @param {object} options Options to send in the ajax request
+    **/
+    _lookup: function(options){
+      this.trigger('lookup');
 
-			R.city = !!loc.city ? loc.city : '';
-			R.province_code = !!loc.province_code ? loc.province_code : '';
-			R.latitude = !!loc.latitude ? loc.latitude : '';
-			R.longitude = !!loc.longitude ? loc.longitude : '';
-			R.latlng = !!loc.latitude && !!loc.longitude ? R.latitude + ',' + R.longitude : '';
+      this._lookupRequest = $.ajax($.extend({
+        type: 'post',
+        dataType: 'json',
+        url: 'http://www.carpages.ca/geography/locationlookup/'
+      }, options));
+    },
 
-			if(!!loc.province_code && !!loc.city){
-				R.title = loc.city + ', ' + loc.province_code;
-			}else if(!!loc.province_code){
-				R.title = loc.province_name || R.province_code;
-			}else{
-				R.title = '';
-			}
+    /**
+     * Parse the location object
+     *
+     * @private
+     * @method
+     * @name jquery.geolocation#_parseLocation
+     * @param {object} location Location object to parse
+     * @return {object} The new location object
+    **/
+    _parseLocation: function(location){
+      //Province and city not set
+      var R = location; //to return
 
-			return R;
-		}
-	};
+      R.city = !!location.city ? location.city : '';
+      R.province_code = !!location.province_code ? location.province_code : '';
+      R.latitude = !!location.latitude ? location.latitude : '';
+      R.longitude = !!location.longitude ? location.longitude : '';
+      R.latlng = !!location.latitude && !!location.longitude ?
+                 R.latitude + ',' + R.longitude :
+                 '';
 
-	// give bindings a second to load before initial search
-	setTimeout(function(){
-		Geo.search.call(Geo);
-	}, 500);
+      if(!!location.province_code && !!location.city){
+        R.title = location.city + ', ' + location.province_code;
+      }else if(!!location.province_code){
+        R.title = location.province_name || R.province_code;
+      }else{
+        R.title = '';
+      }
 
+      return R;
+    }
+  };
 
+  // Do initial search
+  Geo.search.call(Geo);
 
-	// add the Geo to the jQuery object
-	$.geolocation = function() {
-		var args = Array.prototype.slice.call(arguments),
-			method = args[0],
-			options = args.splice(1, 999);
+  // add the Geo to the jQuery object
+  $.geolocation = function() {
+    var args = Array.prototype.slice.call(arguments),
+      method = args[0],
+      options = args.splice(1, 999);
 
-		if (options === undefined) options = {};
+    if (options === undefined) options = {};
 
-		if(Geo[method]!==undefined && method.charAt[0] != '_'){
-			if (typeof Geo[method] === 'function'){
-				return Geo[method].apply(Geo, options) || $;
-			} else {
-				return Geo[method];
-			}
-		}
+    if(Geo[method]!==undefined && method.charAt[0] != '_'){
+      if (typeof Geo[method] === 'function'){
+        return Geo[method].apply(Geo, options) || $;
+      } else {
+        return Geo[method];
+      }
+    }
 
-		return $;
-	};
+    return $;
+  };
 
-	// Return the jquery object
-	// This way you don't need to require both jquery and the Geo
-	return $;
+  // Return the jquery object
+  // This way you don't need to require both jquery and the Geo
+  return $;
 
 });
