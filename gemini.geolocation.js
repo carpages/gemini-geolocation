@@ -7,22 +7,22 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 - It's best to work with the user's location by binding callback functions
 
  *
- * @namespace jquery.geolocation
+ * @namespace gemini.geolocation
  * @copyright Carpages.ca 2014
  * @author Matt Rose <matt@mattrose.ca>
  *
- * @requires jquery
- * @requires jquery.plugin
+ * @requires gemini
+ * @requires jquery.cookie
  *
  * @example
   // Callback for initial load
-  $.geolocation('bind', 'init', function(){
+  G.geolocation('bind', 'init', function(){
     // 'this' has access to all of the plugins methods
     var geo = this;
   });
 
   // Callback for when the location changes
-  $.geolocation('bind', 'change', function(){
+  G.geolocation('bind', 'change', function(){
     consele.log(this.get());
   });
  */
@@ -30,7 +30,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 /* Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP =D
 *** Requires jQuery Cookie Plugin
 ================================================== */
-define(['jquery-loader', 'jquery.cookie'], function($){
+define(['gemini', 'jquery.cookie'], function($){
 
   $.cookie.json = true;//JSON COOKIES!!
 
@@ -67,7 +67,7 @@ define(['jquery-loader', 'jquery.cookie'], function($){
        - change - Runs when the location is changed
      *
      * @method
-     * @name jquery.geolocation#bind
+     * @name gemini.geolocation#bind
      * @param {string} event The name of the event(s)
      * @param {function} callback The callback function
     **/
@@ -89,7 +89,7 @@ define(['jquery-loader', 'jquery.cookie'], function($){
      * Bind an event to run only once
      *
      * @method
-     * @name jquery.geolocation#one
+     * @name gemini.geolocation#one
      * @param {string} event The name of the event(s)
      * @param {function} callback The callback function
     **/
@@ -105,7 +105,7 @@ define(['jquery-loader', 'jquery.cookie'], function($){
      * Trigger an event to run
      *
      * @method
-     * @name jquery.geolocation#trigger
+     * @name gemini.geolocation#trigger
      * @param {string} event The name of the event(s)
     **/
     trigger: function(event){
@@ -135,7 +135,7 @@ define(['jquery-loader', 'jquery.cookie'], function($){
      ```
      *
      * @method
-     * @name jquery.geolocation#set
+     * @name gemini.geolocation#set
      * @param {string} location The location object
      * @param {boolean} cookie Whether to store a cookie
     **/
@@ -184,7 +184,7 @@ define(['jquery-loader', 'jquery.cookie'], function($){
      * Get the current location
      *
      * @method
-     * @name jquery.geolocation#get
+     * @name gemini.geolocation#get
      * @return {object} Current location
     **/
     get: function(){
@@ -195,7 +195,7 @@ define(['jquery-loader', 'jquery.cookie'], function($){
      * Search for the users location
      *
      * @method
-     * @name jquery.geolocation#search
+     * @name gemini.geolocation#search
      * @param {object} options The options for the search
      * @param {boolean} options.reset Weather to ignore any existing cookies
      * @param {string} options.initiator The item that initiated the search (default is 'carpages')
@@ -242,7 +242,7 @@ define(['jquery-loader', 'jquery.cookie'], function($){
      *
      * @private
      * @method
-     * @name jquery.geolocation#_getCookie
+     * @name gemini.geolocation#_getCookie
      * @return {object} The stored cookie object
     **/
     _getCookie: function(){
@@ -255,7 +255,7 @@ define(['jquery-loader', 'jquery.cookie'], function($){
      *
      * @private
      * @method
-     * @name jquery.geolocation#_setCookie
+     * @name gemini.geolocation#_setCookie
      * @param {object} location The location object to store
     **/
     _setCookie: function(location){
@@ -275,7 +275,7 @@ define(['jquery-loader', 'jquery.cookie'], function($){
      *
      * @private
      * @method
-     * @name jquery.geolocation#_runGeoLocation
+     * @name gemini.geolocation#_runGeoLocation
      * @param {string} initiator The initiator of this search
     **/
     _runGeoLocation: function(initiator){
@@ -325,7 +325,7 @@ define(['jquery-loader', 'jquery.cookie'], function($){
      *
      * @private
      * @method
-     * @name jquery.geolocation#_runGeoIP
+     * @name gemini.geolocation#_runGeoIP
      * @param {string} initiator The initiator of this search
     **/
     _runGeoIP: function(initiator){
@@ -358,7 +358,7 @@ define(['jquery-loader', 'jquery.cookie'], function($){
      *
      * @private
      * @method
-     * @name jquery.geolocation#_lookup
+     * @name gemini.geolocation#_lookup
      * @param {object} options Options to send in the ajax request
     **/
     _lookup: function(options){
@@ -376,7 +376,7 @@ define(['jquery-loader', 'jquery.cookie'], function($){
      *
      * @private
      * @method
-     * @name jquery.geolocation#_parseLocation
+     * @name gemini.geolocation#_parseLocation
      * @param {object} location Location object to parse
      * @return {object} The new location object
     **/
