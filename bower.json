@@ -6,9 +6,14 @@
   "main": [
     "gemini.geolocation.js"
   ],
-  "ignore": [],
+  "ignore": [
+    "test"
+  ],
   "dependencies": {
     "gemini-loader": "~0",
     "jquery-cookie": "1.4.x"
+  },
+  "devDependencies": {
+    "requirejs": "~2.1.11"
   }
 }
