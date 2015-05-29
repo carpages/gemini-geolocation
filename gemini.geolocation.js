@@ -26,11 +26,24 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
     consele.log(this.get());
   });
  */
-
-/* Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP =D
-*** Requires jQuery Cookie Plugin
-================================================== */
-define(['gemini', 'jquery.cookie'], function($){
+(function(factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define([
+      'gemini',
+      'jquery.cookie'
+    ], factory);
+  } else if (typeof exports === 'object') {
+    // Node/CommonJS
+    module.exports = factory(
+      require('gemini'),
+      require('jquery.cookie')
+    );
+  } else {
+    // Browser globals
+    factory(G);
+  }
+}(function($) {
 
   $.cookie.json = true;//JSON COOKIES!!
 
@@ -432,4 +445,4 @@ define(['gemini', 'jquery.cookie'], function($){
   // This way you don't need to require both jquery and the Geo
   return $;
 
-});
+}));
