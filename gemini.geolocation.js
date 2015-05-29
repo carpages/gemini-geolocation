@@ -246,7 +246,9 @@ define(['gemini', 'jquery.cookie'], function($){
      * @return {object} The stored cookie object
     **/
     _getCookie: function(){
-      return $.cookie('geo_location') === null ? {} : $.cookie('geo_location');
+      return !$.cookie('geo_location') ?
+        {} :
+        $.cookie('geo_location');
     },
 
     /**
