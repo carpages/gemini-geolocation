@@ -36,7 +36,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
   } else if (typeof exports === 'object') {
     // Node/CommonJS
     module.exports = factory(
-      require('gemini'),
+      require('gemini-loader'),
       require('jquery.cookie')
     );
   } else {
