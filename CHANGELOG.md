@@ -12,3 +12,7 @@
 ## v0.2.2
 
     - Update CommonJS require to `gemini-loader`
+
+## v0.3.0
+
+    - Added ability to change the default URL for ajax location lookups
