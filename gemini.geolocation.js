@@ -73,6 +73,9 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
     // cache of the set location
     _currentLocation: {},
 
+    // default URL to search geolocation object
+    _defaultUrl: '/geography/locationlookup/',
+
     /**
      * Bind events to different location changes
        *Note:* You can bind several events at once using spaces
@@ -251,6 +254,20 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
     },
 
     /**
+     * Set the lookup defaultUrl to a different value than
+     * '/geography/locationlookup/'
+     *
+     * @method
+     * @name gemini.geolocation#url
+     * @param {string} url The URL to query for location lookup
+    **/
+    url: function(url) {
+
+      this._defaultUrl = url;
+
+    },
+
+    /**
      * Get the current cookie object
      *
      * @private
@@ -377,12 +394,14 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @param {object} options Options to send in the ajax request
     **/
     _lookup: function(options){
-      this.trigger('lookup');
+      var plugin = this;
 
-      this._lookupRequest = $.ajax($.extend({
+      plugin.trigger('lookup');
+
+      plugin._lookupRequest = $.ajax($.extend({
         type: 'post',
         dataType: 'json',
-        url: 'http://www.carpages.ca/geography/locationlookup/'
+        url: plugin._defaultUrl
       }, options));
     },
 
