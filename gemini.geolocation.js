@@ -267,6 +267,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
             Geo.set(cookie);
             break;
           }
+          /* falls through */
         default:
           //I will find you!!
           Geo._iWillFindYou(settings.initiator);
