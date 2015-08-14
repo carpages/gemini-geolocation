@@ -16,3 +16,8 @@
 ## v0.3.0
 
     - Added ability to change the default URL for ajax location lookups
+
+## v0.4.0
+
+    - Removed ability to turn off geolocation lookup as an option in search()
+    - Several bugfixes
