@@ -31,21 +31,19 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
     // AMD. Register as an anonymous module.
     define([
       "gemini",
-      "jquery.cookie"
+      "js-cookie"
     ], factory);
   } else if (typeof exports === "object") {
     // Node/CommonJS
     module.exports = factory(
       require("gemini-loader"),
-      require("jquery.cookie")
+      require("js-cookie")
     );
   } else {
     // Browser globals
     factory(G);
   }
-}(function($) {
-
-  $.cookie.json = true;//JSON COOKIES!!
+}(function(G, Cookies) {
 
   var Geo = {
 
@@ -96,7 +94,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
     bind: function(event, callback) {
       var Geo = this;
 
-      $.each(event.split(" "), function(i, evt) {
+      G.each(event.split(" "), function(i, evt) {
         if(Geo._events[evt]===undefined) Geo._events[evt] = [];
         // Call init events immediately if init has already been run
         if(evt == "init" && Geo._init) {
@@ -117,7 +115,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
     **/
     one: function(event, callback) {
       var that = this;
-      $.each(event.split(" "), function(i, evt){
+      G.each(event.split(" "), function(i, evt){
         if(that._events.one[evt]===undefined) that._events.one[evt] = [];
         that._events.one[evt].push(callback);
       });
@@ -134,12 +132,12 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
       var Geo = this;
 
       if(Geo._events[event]!==undefined)
-        $.each(Geo._events[event], function(i, func){
+        G.each(Geo._events[event], function(i, func){
           func.call(Geo);
         });
 
       if(Geo._events.one[event]!==undefined){
-        $.each(Geo._events.one[event], function(i, func){
+        G.each(Geo._events.one[event], function(i, func){
           func.call(Geo);
         });
         Geo._events.one[event] = [];
@@ -172,7 +170,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 
       if(!!location.city) {
         //add the source and initiator
-        location = $.extend({
+        location = G.extend({
           source: "user",
           initiator: "user"
         }, location);
@@ -199,7 +197,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 
       } else {
         Geo.trigger("error");
-        $.error([
+        G.error([
           "Location was not properly sent to geolocation. Check to make sure",
           "the lookup URL's are sending back the right data."
         ].join(" "));
@@ -234,7 +232,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
       // Start timeout
       Geo._searchTimeout = setTimeout(function() {
         Geo.trigger("error");
-        $.error([
+        G.error([
           "The geolocation lookup and and ip lookup timed out."
         ].join(" "));
       }, Geo._geolocationMaxTimeout + 3000);
@@ -245,7 +243,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
       Geo._searching = true;
 
       // properties will be available through settings.propertyName
-      var settings = $.extend({
+      var settings = G.extend({
         reset: false,
         initiator: "carpages"
       }, options);
@@ -298,9 +296,10 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @return {object} The stored cookie object
     **/
     _getCookie: function(){
-      return !$.cookie("geo_location") ?
+      var cookie = Cookies.getJSON("geo_location");
+      return !!cookie ?
         {} :
-        $.cookie("geo_location");
+        cookie;
     },
 
     /**
@@ -311,7 +310,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @name gemini.geolocation#_removeCookie
     **/
     _removeCookie: function() {
-      $.removeCookie("geo_location", { path: "/" });
+      Cookies.remove("geo_location", { path: "/" });
     },
 
     /**
@@ -328,10 +327,10 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 
       if (location.initiator == "user"){
         //Expires in 365 days
-        $.cookie("geo_location", location, { expires: 365, path: "/" });
+        Cookies.set("geo_location", location, { expires: 365, path: "/" });
       } else {
         //Expires at end of session
-        $.cookie("geo_location", location, { path: "/" });
+        Cookies.set("geo_location", location, { path: "/" });
       }
     },
 
@@ -423,7 +422,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 
       plugin.trigger("lookup");
 
-      plugin._lookupRequest = $.ajax($.extend({
+      plugin._lookupRequest = G.ajax(G.extend({
         type: "post",
         dataType: "json",
         url: plugin._defaultUrl
@@ -467,7 +466,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
   Geo.search.call(Geo);
 
   // add the Geo to the jQuery object
-  $.geolocation = function() {
+  G.geolocation = function() {
     var args = Array.prototype.slice.call(arguments),
       method = args[0],
       options = args.splice(1, 999);
@@ -476,17 +475,17 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 
     if(Geo[method]!==undefined && method.charAt[0] != "_") {
       if (typeof Geo[method] === "function") {
-        return Geo[method].apply(Geo, options) || $;
+        return Geo[method].apply(Geo, options) || G;
       } else {
         return Geo[method];
       }
     }
 
-    return $;
+    return G;
   };
 
   // Return the jquery object
   // This way you don't need to require both jquery and the Geo
-  return $;
+  return G;
 
 }));

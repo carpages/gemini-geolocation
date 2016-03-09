@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.0
+
+    - Replaced `jquery-cookie` with `js-cookie`. This could break builds using amd namespacing.
+
 ## v0.2.0
 
     - Added UMD support

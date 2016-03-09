@@ -11,7 +11,7 @@
   ],
   "dependencies": {
     "gemini-loader": "~0",
-    "jquery-cookie": "1.4.x"
+    "js-cookie": "2.1.x"
   },
   "devDependencies": {
     "requirejs": "~2.1.11"

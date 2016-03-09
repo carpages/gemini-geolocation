@@ -1,6 +1,6 @@
 {
   "name": "gemini-geolocation",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "Gemini Geolocation",
   "author": {
     "name": "Matt Rose",
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "gemini-loader": "~0",
-    "jquery.cookie": "1.4.x"
+    "js-cookie": "2.1.x"
   },
   "devDependencies": {
     "grunt": "~0.4.2",
