@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.1
+
+    - Fixed _getCookie method to return proper value
+
 ## v1.0.0
 
     - Replaced `jquery-cookie` with `js-cookie`. This could break builds using amd namespacing.
