@@ -297,9 +297,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
     **/
     _getCookie: function(){
       var cookie = Cookies.getJSON("geo_location");
-      return !!cookie ?
-        {} :
-        cookie;
+      return !!cookie ? cookie : {};
     },
 
     /**
