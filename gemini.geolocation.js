@@ -168,7 +168,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
       Geo._searching = false;
       clearTimeout(Geo._searchTimeout);
 
-      if(!!location.city) {
+      if(typeof location.city !== 'undefined' || typeof location.province_code !== 'undefined') {
         //add the source and initiator
         location = G.extend({
           source: "user",
@@ -182,7 +182,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
         this._currentLocation = location;
 
         //store the cookie?
-        if(cookie && location.city !== " && location.province_code !== ") {
+        if(cookie) {
           this._setCookie(location);
           if(Geo._init) Geo.trigger("cookie");
         }
