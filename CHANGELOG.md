@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.2
+
+    - Fixed set method logic and typo
+
 ## v1.0.1
 
     - Fixed _getCookie method to return proper value
