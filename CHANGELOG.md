@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v1.0.4
+
+  - Update test to use js-cookie and not jquery.cookie
+  - Fix linting errors
+  - Fix source file in linting task
+
 ## v1.0.3
 
   - Remove jshint in favour of eslint with custom ruleset
