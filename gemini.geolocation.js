@@ -96,7 +96,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
       G.each( event.split( ' ' ), function( i, evt ) {
         if ( Geo._events[evt] === undefined ) Geo._events[evt] = [];
         // Call init events immediately if init has already been run
-        if ( evt == 'init' && Geo._init ) {
+        if ( evt === 'init' && Geo._init ) {
           callback.call( Geo );
         }
         Geo._events[evt].push( callback );
@@ -293,7 +293,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
     **/
     _getCookie: function() {
       var cookie = Cookies.getJSON( 'geo_location' );
-      return !!cookie ? cookie : {};
+      return cookie || {};
     },
 
     /**
@@ -319,7 +319,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
     _setCookie: function( location ) {
       Geo._removeCookie();
 
-      if ( location.initiator == 'user' ) {
+      if ( location.initiator === 'user' ) {
         // Expires in 365 days
         Cookies.set( 'geo_location', location, { expires: 365, path: '/' });
       } else {
@@ -433,19 +433,19 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
       // Province and city not set
       var R = location; // to return
 
-      R.city = !!location.city
+      R.city = location.city
         ? location.city
         : '';
 
-      R.province_code = !!location.province_code
+      R.province_code = location.province_code
         ? location.province_code
         : '';
 
-      R.latitude = !!location.latitude
+      R.latitude = location.latitude
         ? location.latitude
         : '';
 
-      R.longitude = !!location.longitude
+      R.longitude = location.longitude
         ? location.longitude
         : '';
 
@@ -455,7 +455,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 
       if ( !!location.province_code && !!location.city ) {
         R.title = location.city + ', ' + location.province_code;
-      } else if ( !!location.province_code ) {
+      } else if ( location.province_code ) {
         R.title = location.province_name || R.province_code;
       } else {
         R.title = '';
@@ -466,7 +466,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
   };
 
   // Do initial search
-  Geo.search.call( Geo );
+  Geo.search();
 
   // add the Geo to the jQuery object
   G.geolocation = function() {
@@ -476,7 +476,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 
     if ( options === undefined ) options = {};
 
-    if ( Geo[method] !== undefined && method.charAt[0] != '_' ) {
+    if ( Geo[method] !== undefined && method.charAt[0] !== '_' ) {
       if ( typeof Geo[method] === 'function' ) {
         return Geo[method].apply( Geo, options ) || G;
       } else {
