@@ -31,7 +31,7 @@ module.exports = function( grunt ) {
       options: {
         configFile: '.eslintrc'
       },
-      target: [ 'gemini.accordion.js' ]
+      target: [ 'gemini.geolocation.js' ]
     },
     connect: {
       server: {
