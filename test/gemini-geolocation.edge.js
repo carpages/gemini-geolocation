@@ -8,7 +8,7 @@ requirejs.config({
     'jquery.boiler' : 'bower_components/jquery-boiler/jquery.boiler',
     'gemini.support': 'bower_components/gemini-support/gemini.support',
     'gemini'        : 'bower_components/gemini-loader/gemini',
-    'jquery.cookie' : 'bower_components/jquery-cookie/jquery.cookie'
+    'js-cookie'     : 'bower_components/js-cookie/src/js.cookie'
   }
 });
 
