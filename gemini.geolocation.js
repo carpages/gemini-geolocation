@@ -170,7 +170,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
       if ( typeof location.city !== 'undefined' || typeof location.province_code !== 'undefined' ) {
         // add the source and initiator
         location = G.extend({
-          source:    'user',
+          source: 'user',
           initiator: 'user'
         }, location );
 
@@ -242,7 +242,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 
       // properties will be available through settings.propertyName
       var settings = G.extend({
-        reset:     false,
+        reset: false,
         initiator: 'carpages'
       }, options );
 
@@ -353,7 +353,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 
           // Lookup the city and province
           Geo._lookup({
-            data:    position.coords,
+            data: position.coords,
             success: function( location ) {
               // When geoIP returns
               location.source = 'geolocation';
@@ -389,7 +389,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 
       // Otherwise, make a server call to find it
       Geo._lookup({
-        data:    {},
+        data: {},
         success: function( location ) {
           // When geoIP returns
           location.source = 'ip';
@@ -414,9 +414,9 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
       plugin.trigger( 'lookup' );
 
       plugin._lookupRequest = G.ajax( G.extend({
-        type:     'post',
+        type: 'post',
         dataType: 'json',
-        url:      plugin._defaultUrl
+        url: plugin._defaultUrl
       }, options ));
     },
 
