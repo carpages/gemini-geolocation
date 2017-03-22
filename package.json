@@ -17,13 +17,9 @@
     "js-cookie": "2.1.x"
   },
   "devDependencies": {
-    "eslint": "^3.8.1",
-    "eslint-config-semistandard": "^7.0.0",
-    "eslint-config-standard": "^6.2.0",
-    "eslint-plugin-promise": "^3.3.0",
-    "eslint-plugin-requirejs": "^3.0.0",
-    "eslint-plugin-standard": "^2.0.1",
     "grunt": "~0.4.2",
+    "eslint": "^3.18.0",
+    "eslint-config-carpages": "^0.2.0",
     "grunt-eslint": "^19.0.0",
     "load-grunt-tasks": "~0.2.0",
     "time-grunt": "~0.2.3"
