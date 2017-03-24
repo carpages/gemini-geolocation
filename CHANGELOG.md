@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.5
+
+  - Use Carpages eslint config
+
 ## v1.0.4
 
   - Update test to use js-cookie and not jquery.cookie
