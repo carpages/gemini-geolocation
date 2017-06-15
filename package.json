@@ -17,10 +17,10 @@
     "js-cookie": "2.1.x"
   },
   "devDependencies": {
-    "eslint": "^3.18.0",
+    "eslint": "^4.0.0",
     "eslint-config-carpages": "^0.2.0",
     "grunt": "^1.0.1",
-    "grunt-eslint": "^19.0.0",
+    "grunt-eslint": "^20.0.0",
     "load-grunt-tasks": "^3.5.2",
     "time-grunt": "^1.4.0"
   },
