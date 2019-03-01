@@ -29,23 +29,16 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 ( function( factory ) {
   if ( typeof define === 'function' && define.amd ) {
     // AMD. Register as an anonymous module.
-    define([
-      'gemini',
-      'js-cookie'
-    ], factory );
+    define([ 'gemini', 'js-cookie' ], factory );
   } else if ( typeof exports === 'object' ) {
     // Node/CommonJS
-    module.exports = factory(
-      require( 'gemini-loader' ),
-      require( 'js-cookie' )
-    );
+    module.exports = factory( require( 'gemini-loader' ), require( 'js-cookie' ));
   } else {
     // Browser globals
     factory( G );
   }
-}( function( G, Cookies ) {
+})( function( G, Cookies ) {
   var Geo = {
-
     // stores the event handlers
     _events: {
       // stores events that only run once
@@ -56,7 +49,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
     _searching: false,
 
     // whether the browser supports HTML5 geolocation
-    _support: ( 'geolocation' in navigator ),
+    _support: 'geolocation' in navigator,
 
     // whether geolocation has been initiated
     _init: false,
@@ -68,7 +61,10 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
     _geolocationTimeout: false,
 
     // geolocation timeout in milliseconds
-    _geolocationMaxTimeout: 4000,
+    _geolocationMaxTimeout: 5000,
+
+    // ip lookup timeout in milliseconds
+    _ipLookupTimeout: 5000,
 
     // search timeout
     _searchTimeout: false,
@@ -110,7 +106,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @name gemini.geolocation#one
      * @param {string} event The name of the event(s)
      * @param {function} callback The callback function
-    **/
+     **/
     one: function( event, callback ) {
       var that = this;
       G.each( event.split( ' ' ), function( i, evt ) {
@@ -125,7 +121,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @method
      * @name gemini.geolocation#trigger
      * @param {string} event The name of the event(s)
-    **/
+     **/
     trigger: function( event ) {
       var Geo = this;
 
@@ -167,12 +163,18 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
       Geo._searching = false;
       clearTimeout( Geo._searchTimeout );
 
-      if ( typeof location.city !== 'undefined' || typeof location.province_code !== 'undefined' ) {
+      if (
+        typeof location.city !== 'undefined' ||
+        typeof location.province_code !== 'undefined'
+      ) {
         // add the source and initiator
-        location = G.extend({
-          source: 'user',
-          initiator: 'user'
-        }, location );
+        location = G.extend(
+          {
+            source: 'user',
+            initiator: 'user'
+          },
+          location
+        );
 
         // parse it
         location = Geo._parseLocation( location );
@@ -195,10 +197,12 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
         }
       } else {
         Geo.trigger( 'error' );
-        G.error([
-          'Location was not properly sent to geolocation. Check to make sure',
-          "the lookup URL's are sending back the right data."
-        ].join( ' ' ));
+        G.error(
+          [
+            'Location was not properly sent to geolocation. Check to make sure',
+            "the lookup URL's are sending back the right data."
+          ].join( ' ' )
+        );
       }
     },
 
@@ -208,7 +212,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @method
      * @name gemini.geolocation#get
      * @return {object} Current location
-    **/
+     **/
     get: function() {
       return this._currentLocation;
     },
@@ -221,17 +225,9 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @param {object} options The options for the search
      * @param {boolean} options.reset Weather to ignore any existing cookies
      * @param {string} options.initiator The item that initiated the search (default is 'carpages')
-    **/
+     **/
     search: function( options ) {
       var Geo = this;
-
-      // Start timeout
-      Geo._searchTimeout = setTimeout( function() {
-        Geo.trigger( 'error' );
-        G.error([
-          'The geolocation lookup and and ip lookup timed out.'
-        ].join( ' ' ));
-      }, Geo._geolocationMaxTimeout + 3000 );
 
       // No need to double up on searches
       if ( Geo._searching ) {
@@ -240,11 +236,20 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
 
       Geo._searching = true;
 
+      // Start timeout
+      Geo._searchTimeout = setTimeout( function() {
+        Geo.trigger( 'error' );
+        G.error( 'The geolocation lookup and and ip lookup timed out.' );
+      }, Geo._geolocationMaxTimeout + Geo._ipLookupTimeout );
+
       // properties will be available through settings.propertyName
-      var settings = G.extend({
-        reset: false,
-        initiator: 'carpages'
-      }, options );
+      var settings = G.extend(
+        {
+          reset: false,
+          initiator: 'carpages'
+        },
+        options
+      );
 
       // reset cookie
       if ( settings.reset ) {
@@ -264,7 +269,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
             Geo.set( cookie );
             break;
           }
-          /* falls through */
+        /* falls through */
         default:
           // I will find you!!
           Geo._iWillFindYou( settings.initiator );
@@ -278,7 +283,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @method
      * @name gemini.geolocation#url
      * @param {string} url The URL to query for location lookup
-    **/
+     **/
     url: function( url ) {
       this._defaultUrl = url;
     },
@@ -290,7 +295,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @method
      * @name gemini.geolocation#_getCookie
      * @return {object} The stored cookie object
-    **/
+     **/
     _getCookie: function() {
       var cookie = Cookies.getJSON( 'geo_location' );
       return cookie || {};
@@ -302,7 +307,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @private
      * @method
      * @name gemini.geolocation#_removeCookie
-    **/
+     **/
     _removeCookie: function() {
       Cookies.remove( 'geo_location', { path: '/' });
     },
@@ -315,7 +320,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @method
      * @name gemini.geolocation#_setCookie
      * @param {object} location The location object to store
-    **/
+     **/
     _setCookie: function( location ) {
       Geo._removeCookie();
 
@@ -335,7 +340,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @method
      * @name gemini.geolocation#_iWillFindYou
      * @param {string} initiator The initiator of this search
-    **/
+     **/
     _iWillFindYou: function( initiator ) {
       var Geo = this;
 
@@ -345,26 +350,26 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
           Geo._runGeoIP( initiator );
         }, Geo._geolocationMaxTimeout );
 
-        navigator.geolocation.getCurrentPosition( function( position ) {
-          // Geo location is successful
+        navigator.geolocation.getCurrentPosition(
+          function( position ) {
+            // Geo location is successful
+            // Cancel IP lookup
+            clearTimeout( Geo._geolocationTimeout );
 
-          // Cancel IP lookup
-          clearTimeout( Geo._geolocationTimeout );
-
-          // Lookup the city and province
-          Geo._lookup({
-            data: position.coords,
-            success: function( location ) {
-              // When geoIP returns
-              location.source = 'geolocation';
-              location.initiator = initiator;
-
-              Geo.set( location );
-            }
-          });
-        }, function() {
-          // When geolocation fails
-        },
+            // Lookup the city and province
+            Geo._lookup({
+              data: position.coords,
+              success: function( location ) {
+                // When geoIP returns
+                location.source = 'geolocation';
+                location.initiator = initiator;
+                Geo.set( location );
+              }
+            });
+          },
+          function() {
+            // When geolocation fails
+          },
           {
             timeout: Geo._geolocationMaxTimeout
           }
@@ -382,7 +387,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @method
      * @name gemini.geolocation#_runGeoIP
      * @param {string} initiator The initiator of this search
-    **/
+     **/
     _runGeoIP: function( initiator ) {
       // Look up the geo IP
       var Geo = this;
@@ -407,17 +412,22 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @method
      * @name gemini.geolocation#_lookup
      * @param {object} options Options to send in the ajax request
-    **/
+     **/
     _lookup: function( options ) {
       var plugin = this;
 
       plugin.trigger( 'lookup' );
 
-      plugin._lookupRequest = G.ajax( G.extend({
-        type: 'post',
-        dataType: 'json',
-        url: plugin._defaultUrl
-      }, options ));
+      plugin._lookupRequest = G.ajax(
+        G.extend(
+          {
+            type: 'post',
+            dataType: 'json',
+            url: plugin._defaultUrl
+          },
+          options
+        )
+      );
     },
 
     /**
@@ -428,30 +438,23 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
      * @name gemini.geolocation#_parseLocation
      * @param {object} location Location object to parse
      * @return {object} The new location object
-    **/
+     **/
     _parseLocation: function( location ) {
       // Province and city not set
       var R = location; // to return
 
-      R.city = location.city
-        ? location.city
-        : '';
+      R.city = location.city ? location.city : '';
 
-      R.province_code = location.province_code
-        ? location.province_code
-        : '';
+      R.province_code = location.province_code ? location.province_code : '';
 
-      R.latitude = location.latitude
-        ? location.latitude
-        : '';
+      R.latitude = location.latitude ? location.latitude : '';
 
-      R.longitude = location.longitude
-        ? location.longitude
-        : '';
+      R.longitude = location.longitude ? location.longitude : '';
 
-      R.latlng = !!location.latitude && !!location.longitude
-        ? R.latitude + ',' + R.longitude
-        : '';
+      R.latlng =
+        !!location.latitude && !!location.longitude
+          ? R.latitude + ',' + R.longitude
+          : '';
 
       if ( !!location.province_code && !!location.city ) {
         R.title = location.city + ', ' + location.province_code;
@@ -490,4 +493,4 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
   // Return the jquery object
   // This way you don't need to require both jquery and the Geo
   return G;
-}));
+});
