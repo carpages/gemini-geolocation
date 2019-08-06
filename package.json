@@ -13,16 +13,16 @@
     "url": "https://github.com/carpages/gemini-geolocation"
   },
   "dependencies": {
-    "gemini-loader": "~0",
-    "js-cookie": "2.1.x"
+    "gemini-loader": "0.5.x",
+    "js-cookie": "2.x"
   },
   "devDependencies": {
-    "eslint": "^3.18.0",
-    "eslint-config-carpages": "^0.2.0",
-    "grunt": "^1.0.1",
-    "grunt-eslint": "^19.0.0",
-    "load-grunt-tasks": "^3.5.2",
-    "time-grunt": "^1.4.0"
+    "eslint": "5.16.x",
+    "eslint-config-carpages": "3.x",
+    "grunt": "^1.0.4",
+    "grunt-eslint": "^22.0.0",
+    "load-grunt-tasks": "^5.1.0",
+    "time-grunt": "^2.0.0"
   },
-  "licenses": "MIT"
+  "license": "MIT"
 }

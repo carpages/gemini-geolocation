@@ -163,10 +163,7 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
       Geo._searching = false;
       clearTimeout( Geo._searchTimeout );
 
-      if (
-        typeof location.city !== 'undefined' ||
-        typeof location.province_code !== 'undefined'
-      ) {
+      if ( typeof location.city !== 'undefined' || typeof location.province_code !== 'undefined' ) {
         // add the source and initiator
         location = G.extend(
           {
@@ -444,17 +441,10 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
       var R = location; // to return
 
       R.city = location.city ? location.city : '';
-
       R.province_code = location.province_code ? location.province_code : '';
-
       R.latitude = location.latitude ? location.latitude : '';
-
       R.longitude = location.longitude ? location.longitude : '';
-
-      R.latlng =
-        !!location.latitude && !!location.longitude
-          ? R.latitude + ',' + R.longitude
-          : '';
+      R.latlng = !!location.latitude && !!location.longitude ? R.latitude + ',' + R.longitude : '';
 
       if ( !!location.province_code && !!location.city ) {
         R.title = location.city + ', ' + location.province_code;
@@ -485,6 +475,8 @@ Manage the users Geo Location - Based on Cookies, HTML5, and GeoIP
       } else {
         return Geo[method];
       }
+    } else if ( method === 'instance' ) {
+      return Geo;
     }
 
     return G;

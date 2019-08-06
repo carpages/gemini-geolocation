@@ -1,19 +1,14 @@
 {
   "name": "gemini-geolocation",
-  "authors": [
-    {"name": "Matt Rose", "email": "matt@mattrose.ca"}
-  ],
-  "main": [
-    "gemini.geolocation.js"
-  ],
-  "ignore": [
-    "test"
-  ],
+  "authors": [{ "name": "Matt Rose", "email": "matt@mattrose.ca" }],
+  "main": ["gemini.geolocation.js"],
+  "ignore": ["test"],
   "dependencies": {
-    "gemini-loader": "~0",
-    "js-cookie": "2.1.x"
+    "gemini-loader": "0.5.x",
+    "js-cookie": "2.x"
   },
   "devDependencies": {
-    "requirejs": "~2.1.11"
+    "requirejs": "2.x",
+    "jquery-mockjax": "2.x"
   }
 }
